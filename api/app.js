@@ -4,10 +4,17 @@ var cors = require('cors');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var multer = require('multer');
+var upload = multer({dest:'./upload/'});
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var usuarioRouter = require('./routes/usuario');
 var carpetasCompartidasRouter = require('./routes/carpetas-compartidas');
+var solicitudFileServerRouter = require('./routes/solicitud-file-server');
+var catalogoRouter = require('./routes/catalogo');
+var categoriaRouter = require('./routes/categoria');
+var ticketRouter = require('./routes/ticket');
+var ticketDetalleRouter = require('./routes/ticket-detalle');
 
 var app = express();
 
@@ -22,9 +29,18 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// for parsing multipart/form-data
+app.use(upload.any()); 
+app.use(express.static('public'));
+
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/usuario', usuarioRouter);
 app.use('/carpetas-compartidas', carpetasCompartidasRouter);
+app.use('/solicitud-file-server', solicitudFileServerRouter);
+app.use('/catalogo', catalogoRouter);
+app.use('/categoria', categoriaRouter);
+app.use('/ticket', ticketRouter);
+app.use('/ticket-detalle', ticketDetalleRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

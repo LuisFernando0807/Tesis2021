@@ -1,13 +1,25 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { connect } from "react-redux";
+import { Link, Redirect } from "react-router-dom";
 import imgGestionInventarios from "../assets/icon_inventario 1.svg";
 import imgServiceDesk from "../assets/icon_servicedesk 1.svg";
 import imgGestionFileServer from "../assets/icon_fileserver 1.svg";
 
 import "./styles/Home.scss";
+// import Util from "../helper/util";
 
 class Home extends React.Component {
+  // constructor(props) {
+  //   new Util().initLogin(props);
+  //   super(props);
+  // }
+
   render() {
+    const { user } = this.props;
+    if (user == null) {
+      return <Redirect to="/login" />;
+    }
+
     return (
       <div className="home-container">
         <div className="title">
@@ -55,4 +67,11 @@ class Home extends React.Component {
   }
 }
 
-export default Home;
+const mapStateToProps = (state) => {
+  return {
+    user: state.user,
+    isLogin: state.isLogin,
+  };
+};
+
+export default connect(mapStateToProps, null)(Home);

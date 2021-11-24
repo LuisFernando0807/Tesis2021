@@ -20,7 +20,7 @@
       margin-bottom: 10px;
     }
 
-    & input[type="text"] {
+    & input[type="text"], & input[type="password"] {
       font-size: 32px;
       padding: 10px;
       background-color: var(--color-melon);

@@ -6,6 +6,10 @@
   padding: 20px;
   align-items: center;
 
+  a{
+    text-decoration: none;
+  }
+  
   &-title {
     font-size: 30px;
     font-weight: bold;
@@ -15,10 +19,18 @@
     margin-left: auto;
     display: flex;
     align-items: center;
-
+    
     &-help-text{
         font-size: 14px;
         font-weight: bold;
+      }
+  }
+  
+  & .user-account{
+    display: flex;
+    margin-left: auto;
+    & a {
+      color: white;
     }
   }
 }

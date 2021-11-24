@@ -1,0 +1,48 @@
+.nav-section {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-melon);
+  padding: 10px;
+  margin-top: 10px;
+
+  & a {
+    text-decoration: none;
+  }
+
+  & > .title {
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+
+  & > .menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    // margin-top: 10px;
+
+    & > span {
+      color: white;
+      display: flex;
+      background-color: var(--color-azul);
+      border-radius: 20px;
+      text-align: center;
+      flex-direction: column;
+      padding: 10px;
+    }
+
+    & > .nav-list {
+      display: flex;
+      flex-direction: column;
+      background-color: var(--color-melon);
+
+      & > .item {
+        display: flex;
+        padding: 10px 0px 10px 10px;
+
+        & a {
+          color: white;
+        }
+      }
+    }
+  }
+}

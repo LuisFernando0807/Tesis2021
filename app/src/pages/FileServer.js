@@ -1,28 +1,20 @@
 import React from "react";
+import { connect } from "react-redux";
+import NavSide from "../components/NavSide";
+import Profile from "../components/Profile";
 
 import "./styles/FileServer.scss";
 
 class FileServer extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      carpetas: null,
-      vista: "renderSolicitud",
-      listaTipoPermiso: ["Lectura", "Lectura/Escritura"],
-      archivoAdjunto: {},
-    };
-  }
-
-  getCarpetasApi() {
-    let url = `http://localhost:3030/carpetas-compartidas/listar`;
-    fetch(url)
-      .then((r) => r.json())
-      .then((data) => this.setState({ carpetas: data }));
-  }
-
-  componentDidMount() {
-    this.getCarpetasApi();
-  }
+  state = {
+    carpetas: this.props.carpetaCompartidaList,
+    vista: "renderSolicitud",
+    archivoAdjunto: {},
+    urgencia: "",
+    solicitante: `${this.props.user.usuario_nombre} ${this.props.user.usuario_apellido}`,
+    seGuardoSolicitud: false,
+    usuarioregistro: this.props.user.usuario_codigo,
+  };
 
   renderCarpetas(data) {
     const render =
@@ -85,7 +77,7 @@ class FileServer extends React.Component {
   }
 
   renderCarpetasSeleccionadas(data) {
-    const { listaTipoPermiso } = this.state;
+    const { tipoPermisoList } = this.props;
     const render =
       data == null ? null : (
         <ul className="list">
@@ -197,7 +189,7 @@ class FileServer extends React.Component {
                                                     <option value="">
                                                       [Seleccione...]
                                                     </option>
-                                                    {listaTipoPermiso.map(
+                                                    {tipoPermisoList.map(
                                                       (item, index) => (
                                                         <option
                                                           key={index}
@@ -321,7 +313,7 @@ class FileServer extends React.Component {
               };
             });
     return (
-      <div className="file-server-container">
+      <div className="file-server-form">
         <div className="title">
           <h3>SERVIDOR DE ARCHIVOS PAMFPSLIM02</h3>
         </div>
@@ -329,20 +321,31 @@ class FileServer extends React.Component {
           <div className="list-container">
             {this.renderCarpetas(carpetasBase)}
           </div>
-          <button
-            className="btn"
-            type="submit"
-            onClick={() => this.clickGenerarSolicitud()}
-          >
-            GENERAR SOLICITUD
-          </button>
+          <div className="btns">
+            <button
+              className="btn"
+              type="submit"
+              onClick={() => this.clickGenerarSolicitud()}
+            >
+              GENERAR SOLICITUD
+            </button>
+            &nbsp;
+            <button
+              className="btn btn-red"
+              type="button"
+              onClick={() => this.regresarMenuPrincipal()}
+            >
+              REGRESAR AL MENÚ PRINCIPAL
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   renderConfirmarSolicitud() {
-    const { carpetas, archivoAdjunto } = this.state;
+    const { carpetas, archivoAdjunto, solicitante, urgencia } = this.state;
+    const { urgenciaList } = this.props;
     const carpetasHijo =
       carpetas == null
         ? null
@@ -376,7 +379,7 @@ class FileServer extends React.Component {
             });
 
     return (
-      <div className="file-server-container">
+      <div className="file-server-form">
         <div className="title">
           <h3>SERVIDOR DE ARCHIVOS PAMFPSLIM02</h3>
         </div>
@@ -385,7 +388,25 @@ class FileServer extends React.Component {
             <label>SOLICITANTE:</label>
             &nbsp;
             <div className="input-container">
-              <input type="text" value="LUIS RAMOS" readOnly />
+              <input type="text" value={solicitante} readOnly />
+            </div>
+          </div>
+          <br />
+          <div className="urgent-container">
+            <label>URGENCIA:</label>
+            &nbsp;
+            <div className="input-container">
+              <select
+                value={urgencia}
+                onChange={(e) => this.changeUrgencia(e.currentTarget.value)}
+              >
+                <option value="">[Seleccione...]</option>
+                {urgenciaList.map((item, index) => (
+                  <option key={index} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
           <div className="list-container">
@@ -418,11 +439,19 @@ class FileServer extends React.Component {
             </div>
           </div>
           <div className="btns">
-            <button className="btn" type="button">
+            <button
+              className="btn"
+              type="button"
+              onClick={() => this.guardarSolicitud()}
+            >
               ENVIAR
             </button>
             &nbsp;
-            <button className="btn btn-red" type="button">
+            <button
+              className="btn btn-red"
+              type="button"
+              onClick={() => this.cancelarSolicitud()}
+            >
               CANCELAR
             </button>
           </div>
@@ -431,10 +460,55 @@ class FileServer extends React.Component {
     );
   }
 
-  render() {
-    const { vista } = this.state;
+  renderMensaje() {
+    const { seGuardoSolicitud } = this.state;
+    return (
+      <div className="file-server-form">
+        <div className="title">
+          <h3>{`${seGuardoSolicitud ? "S" : "No s"}e guardó la solicitud`}</h3>
+        </div>
+        <div className="form-container">
+          <div className="btns">
+            <button
+              className="btn"
+              type="button"
+              onClick={() => this.regresarMenuPrincipal()}
+            >
+              REGRESAR AL MENÚ PRINCIPAL
+            </button>
+            &nbsp;
+            <button
+              className="btn btn-red"
+              type="button"
+              onClick={() => this.cancelarSolicitud()}
+            >
+              REGISTRAR NUEVA SOLICITUD
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-    return this[vista]();
+  render() {
+    const { navList, vista } = this.state;
+
+    return (
+      <div className="file-server-container">
+        <div className="nav-side-section">
+          <Profile />
+          <NavSide data={navList} />
+        </div>
+        <div className="content-section">
+          {/* <ul className="kpi-list">
+            {listaKPI.map((x, i) => (
+              <KPICard key={i} {...x} />
+            ))}
+          </ul> */}
+          <div className="content-container">{this[vista]()}</div>
+        </div>
+      </div>
+    );
   }
 
   toggleCarpetaContenido(index) {
@@ -444,6 +518,10 @@ class FileServer extends React.Component {
     carpetas[index].isOpen = isOpen;
 
     this.setState({ carpetas: carpetas });
+  }
+
+  changeUrgencia(id) {
+    this.setState({ urgencia: id });
   }
 
   changePermiso(id) {
@@ -597,6 +675,86 @@ class FileServer extends React.Component {
 
     this.setState({ archivoAdjunto: objFile });
   };
-}
 
-export default FileServer;
+  guardarSolicitud() {
+    const { solicitante, urgencia, archivoAdjunto, usuarioregistro, carpetas } = this.state;
+    const carpetasHijo =
+      carpetas == null
+        ? null
+        : carpetas.filter(
+            (x) =>
+              x.carp_compartida_codigo_padre != null &&
+              x.checked &&
+              (x.permisos || []).length > 0
+          );
+    const detalle = [];
+    for (let carpeta of carpetasHijo) {
+      for (let permiso of carpeta.permisos) {
+        let item = {};
+        item.carp_compartida_codigo = carpeta.carp_compartida_codigo;
+        item.correo = permiso.usuario;
+        item.permiso = permiso.tipo;
+        detalle.push(item);
+      }
+    }
+
+    const formData = new FormData();
+    formData.append("archivo", archivoAdjunto.file);
+    formData.append("solicitante", solicitante);
+    formData.append("urgencia", urgencia);
+    formData.append("usuarioregistro", usuarioregistro);
+    for (let index in detalle) {
+      let item = detalle[index];
+      formData.append(
+        `detalle[${index}][carp_compartida_codigo]`,
+        item.carp_compartida_codigo
+      );
+      formData.append(`detalle[${index}][correo]`, item.correo);
+      formData.append(`detalle[${index}][permiso]`, item.permiso);
+    }
+    let url = `http://localhost:3030/solicitud-file-server/guardar`;
+
+    let init = {};
+    init.method = "POST";
+    init.body = formData;
+
+    fetch(url, init)
+      .then((x) => x.json())
+      .then((data) => {
+        this.setState({ vista: "renderMensaje", seGuardoSolicitud: data });
+      });
+  }
+
+  cancelarSolicitud() {
+    const { carpetas } = this.state;
+
+    for (let carpeta of carpetas) {
+      delete carpeta.checked;
+      delete carpeta.permisos;
+      delete carpeta.isOpen;
+    }
+
+    this.setState({
+      vista: "renderSolicitud",
+      carpetas: carpetas,
+      urgencia: "",
+      archivoAdjunto: {},
+      seGuardoSolicitud: false,
+    });
+  }
+
+  regresarMenuPrincipal() {
+    this.props.history.push("/");
+  }
+}
+const mapStateToProp = (state) => {
+  return {
+    user: state.user,
+    isLogin: state.isLogin,
+    carpetaCompartidaList: state.carpetaCompartidaList,
+    tipoPermisoList: state.tipoPermisoList,
+    urgenciaList: state.urgenciaList,
+  };
+};
+
+export default connect(mapStateToProp, null)(FileServer);
