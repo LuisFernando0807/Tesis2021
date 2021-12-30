@@ -21,8 +21,10 @@
   & .list-container {
     margin-top: 50px;
     & .list {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      display: flex;
+      justify-content: space-evenly;
+      // display: grid;
+      // grid-template-columns: 1fr 1fr 1fr;
       width: 100%;
       & .item {
         display: flex;

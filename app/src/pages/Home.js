@@ -30,17 +30,19 @@ class Home extends React.Component {
         </div>
         <div className="list-container">
           <ul className="list">
-            <li className="item">
-              <Link to="/gestion-inventario" className="btn">
-                <div className="img">
-                  <img
-                    src={imgGestionInventarios}
-                    alt="Gestión de Inventarios"
-                  />
-                </div>
-                <div className="text">Gestión de Inventarios</div>
-              </Link>
-            </li>
+            {user.usuario_perfil == "A" ? (
+              <li className="item">
+                <Link to="/gestion-inventario" className="btn">
+                  <div className="img">
+                    <img
+                      src={imgGestionInventarios}
+                      alt="Gestión de Inventarios"
+                    />
+                  </div>
+                  <div className="text">Gestión de Inventarios</div>
+                </Link>
+              </li>
+            ) : null}
             <li className="item">
               <Link to="/service-desk" className="btn">
                 <div className="img">
